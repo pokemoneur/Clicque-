@@ -189,6 +189,7 @@ spect:['You are spectating','Estás de espectador','Tu es spectateur','Você est
 send:['Send','Enviar','Envoyer','Enviar','Senden','发送'],
 ready:['I’m ready ›','Estoy listo ›','Prêt ›','Pronto ›','Bereit ›','我准备好了 ›'],
 readyWaiting:['{0}/{1} ready · phase advances above half','{0}/{1} listos · la fase avanza al superar la mitad','{0}/{1} prêts · la phase avance au-delà de la moitié','{0}/{1} prontos · a fase avança acima da metade','{0}/{1} bereit · Phase wechselt bei mehr als der Hälfte','{0}/{1} 人准备好 · 超过一半后进入下一阶段'],
+aiReady:['You and the AI players are ready. Moving on…','Tú y los jugadores IA están listos. Continuando…','Vous et les joueurs IA êtes prêts. On continue…','Você e os jogadores IA estão prontos. Continuando…','Du und die KI-Spieler sind bereit. Weiter geht’s…','你和 AI 玩家已准备好，继续…'],
 killSelect:['🎯 The Killcard selected {0} selector(s).','🎯 La Killcard eligió {0} selector(es).','🎯 La Killcard a choisi {0} sélectionneur(s).','🎯 A Killcard escolheu {0} seletor(es).','🎯 Die Killcard wählte {0} Abstimmer.','🎯 Killcard 选出了 {0} 名决定者。'],
 killVote:['🃏 Killcard: choose one player to eliminate','🃏 Killcard: elige a quién eliminar','🃏 Killcard : choisis qui éliminer','🃏 Killcard: escolha quem eliminar','🃏 Killcard: Wähle eine Person zum Rauswurf','🃏 Killcard：选择一名淘汰对象'],
 killOut:['Killcard eliminated: {0}','La Killcard eliminó a: {0}','Élimination Killcard : {0}','Eliminação Killcard: {0}','Killcard schloss aus: {0}','Killcard 淘汰了：{0}'],
@@ -741,7 +742,7 @@ if(ty)ty.textContent='';emit(m);
 await wait((m.fast?1900+Math.random()*1500:3800+Math.random()*3800)*TALK())}}
 function chat(){return new Promise(res=>{const me=G.P.find(p=>p.hum),my=G.chatId={};let tl=G.endChat?44:chatSecs(),readyDone=false,readySet=new Set(),readyTimer=0,readyRef=null,finishChat;
 G.chatOn=true;G.talked=0;G.cnt=0;G.rmsgs={};G.intent={};G.last=null;G.pend=[];G.q=[];G.starve=0;G.late=false;if(!G.endChat)gameEvent('round_start');else G.talked=1;G.evq=[];
-panel(`<span class="badge">${G.endChat?'🎤 '+t('endChatT'):t('round',G.n)}</span><h3>${t('disc')}</h3><div id="lg" class="log"></div><div id="typ" class="muted" style="min-height:1.4em"></div><div class="row"><input id="ms" placeholder="${me.alive?t('say'):t('spect')}" ${me.alive?'':'disabled'} maxlength="80"><button class="btn" id="sd" ${me.alive?'':'disabled'}>${t('send')}</button></div><p class="muted">⏱ <b id="tt">${tl}</b>s${G.mp&&me.alive?` · <button class="btn ghost" id="rd">${t('ready')}</button>`:''}${!G.mp?` · <a href="#" id="sk">${G.r.solo?t('ready'):t('skipDemo')}</a>`:''}</p><p class="muted" id="rdy"></p>`);
+panel(`<span class="badge">${G.endChat?'🎤 '+t('endChatT'):t('round',G.n)}</span><h3>${t('disc')}</h3><div id="lg" class="log"></div><div id="typ" class="muted" style="min-height:1.4em"></div><div class="row"><input id="ms" placeholder="${me.alive?t('say'):t('spect')}" ${me.alive?'':'disabled'} maxlength="80"><button class="btn" id="sd" ${me.alive?'':'disabled'}>${t('send')}</button></div><p class="muted">⏱ <b id="tt">${tl}</b>s${G.mp&&me.alive?` · <button class="btn ghost" id="rd">${t('ready')}</button>`:''}${G.r.solo&&me.alive?` · <button class="btn ghost" id="soloReady">${t('ready')}</button>`:(!G.mp&&!G.r.solo?` · <a href="#" id="sk">${t('skipDemo')}</a>`:'')}</p><p class="muted" id="rdy"></p>`);
 const chatInfo={on:true,round:G.n,deadline:Date.now()+tl*1000,end:!!G.endChat,ready:[]};
 if(G.mp){mpPush({chat:chatInfo});readyRef=NET.db.collection(`rooms/${G.mp.code}/ready`);const refreshReady=async()=>{try{const s=await readyRef.get(),xs=s.docs.filter(d=>d.data().g===G.gid&&d.data().r===G.n).map(d=>d.id);readySet=new Set(xs);if(readySet.has(NET.uid)){const b=q('rd');if(b)b.textContent='✓ '+t('ready')}const el=q('rdy');if(el)el.textContent=t('readyWaiting',readySet.size,A().length);chatInfo.ready=xs;const need=Math.floor(A().length/2)+1;if(!readyDone&&readySet.size>=need)finishChat();else mpPush({chat:chatInfo})}catch(e){}};
  const unsub=readyRef.onSnapshot(refreshReady,()=>{});readyTimer=setInterval(refreshReady,2000);TM.push(readyTimer);const b=q('rd');if(b)b.onclick=async()=>{try{await readyRef.doc(NET.uid).set({g:G.gid,r:G.n,ts:Date.now()});await refreshReady()}catch(e){}}}
@@ -749,7 +750,7 @@ let cid=0;const end=finishChat=()=>{if(readyDone)return;readyDone=true;storyChat
 cid=tick(()=>{tl--;const e=q('tt');if(e)e.textContent=tl;G.late=tl<=25;if(tl<=0)end()},1000);
 loopTalk(my);
 const send=()=>{const i=q('ms'),v=i.value.trim();if(!v||!me.alive)return;i.value='';humanSaid(me,v,false)};
-q('sd').onclick=send;q('ms').onkeydown=e=>{if(e.key==='Enter')send()};const sk=q('sk');if(sk)sk.onclick=e=>{e.preventDefault();end()}})}
+q('sd').onclick=send;q('ms').onkeydown=e=>{if(e.key==='Enter')send()};const sk=q('sk');if(sk)sk.onclick=e=>{e.preventDefault();end()};const sr=q('soloReady');if(sr)sr.onclick=()=>{sr.textContent='✓ '+t('ready');sr.disabled=true;const st=q('rdy');if(st)st.textContent=t('aiReady');end()}})}
 
 /* ---------- rounds ---------- */
 const grp=k=>k=='players'?A():k=='dead'?D():[AI];
