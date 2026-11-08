@@ -45,7 +45,7 @@ prev=cur;next({docs:a.map(x=>snapDoc(x.id,x.d)),size:a.length,empty:!a.length,do
 this._fetch().then(rows=>{rows.forEach(r=>map.set(r.id,r.data));emit()}).catch(e=>error&&error(e));
 const chn=sb.channel('c:'+path+rid()).on('postgres_changes',{event:'*',schema:'public',table:'docs',filter:'parent=eq.'+path},p=>{if(p.eventType==='DELETE'){map.delete(p.old.id)}else{const r=p.new;if(match(r.data))map.set(r.id,r.data);else map.delete(r.id)}emit()}).subscribe();
 return()=>{on=false;sb.removeChannel(chn)}}});
-return{...q([],null,null),doc(id){return docRef(path+'/'+(id||rid()))},async add(d){const ref=docRef(path+'/'+rid());await ref.set(d);return ref}}}
+return{...q([],null,null),doc(id){return docRef(path+'/'+(id||rid()))},async add(d){const ref=docRef(path+'/'+rid());await ref.set(d);return ref},async get(){const rows=await q([],null,null)._fetch();return{docs:rows.map(r=>snapDoc(r.id,r.data)),size:rows.length,empty:!rows.length}}}}
 return{doc:docRef,collection:colRef}}
 function mkUser(sb){const id=sb.__uid;return{id:async()=>id,can:async()=>true,isOwner:async()=>false,canEdit:async()=>false,me:async()=>({id,name:''}),name:async()=>''}}
 function mkSample(sb){
