@@ -294,7 +294,7 @@ function genNames(n){const used=new Set([CFG.name.toLowerCase()]),out=[];while(o
 
 /* ---------- menus ---------- */
 const langBtn=()=>`<div style="text-align:right"><button class="back" style="padding:0 10px" onclick="langs()">🌐 ${NATIVE[LI()]}</button></div>`;
-function menu(){RUN++;clearT();if(!CFG.setup)return avatar(true);screen(langBtn()+`<div class="logo">CLIC<b>QUE</b></div><p class="tag">${t('tag')}</p><div class="stack"><button class="btn" onclick="solo()">🎮 ${t('single')}</button><button class="btn" onclick="online()">🌐 ${t('online')}</button><button class="btn ghost" onclick="avatar(false,'menu()')">${MYAV()} ${CFG.name} · ${t('avatarBtn')}</button><button class="btn ghost" onclick="settings()">⚙️ ${t('settings')}</button></div>`)}
+function menu(){RUN++;clearT();if(!CFG.setup)return avatar(true);if(new URL(location.href).searchParams.has('room')){joinRoomLink();return}screen(langBtn()+`<div class="logo">CLIC<b>QUE</b></div><p class="tag">${t('tag')}</p><div class="stack"><button class="btn" onclick="solo()">🎮 ${t('single')}</button><button class="btn" onclick="online()">🌐 ${t('online')}</button><button class="btn ghost" onclick="avatar(false,'menu()')">${MYAV()} ${CFG.name} · ${t('avatarBtn')}</button><button class="btn ghost" onclick="settings()">⚙️ ${t('settings')}</button></div>`)}
 function langs(){screen(hdr(t('lang'),'menu()')+LANGS.map((l,i)=>`<button class="btn ${CFG.lang==l?'':'ghost'}" onclick="CFG.lang='${l}';ST();document.documentElement.lang='${l}';menu()">${NATIVE[i]}</button>`).join(''))}
 function setName(v){CFG.name=v.replace(/[^\w \-\u00c0-\u00ff]/g,'').trim().slice(0,12)||'Ace';ST()}
 function photo(inp,first,from){const f=inp.files&&inp.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{const im=new Image();im.onload=()=>{try{const c=document.createElement('canvas');c.width=c.height=128;const m=Math.min(im.width,im.height);c.getContext('2d').drawImage(im,(im.width-m)/2,(im.height-m)/2,m,m,0,0,128,128);CFG.photo=c.toDataURL('image/jpeg',.8);ST();avatar(first,from)}catch(e){}};im.src=rd.result};rd.readAsDataURL(f)}
@@ -341,41 +341,45 @@ tick(()=>{if(L.ppl.length<goal){addP();drawLobby()}else if(L.ppl.length>=r.n)go(
 function drawLobby(){const r=L.r,k=L.ppl.length;screen(hdr(esc(r.name))+`<div class="card"><p class="muted">${r.priv?'🔒 '+t('privL'):'🌍 '+t('pub')}${r.priv&&r.code?' · '+esc(r.code):''} · ${(r.solo?CFG.soloChat:r.chat)?t('sec',r.solo?CFG.soloChat:r.chat):t('noChat')}</p><h3>${k}/${r.n}</h3><div class="grid">${Array.from({length:r.n},(_,i)=>L.ppl[i]?`<div class="pl">${L.ppl[i].emo}<span>${L.ppl[i].name}</span></div>`:'<div class="pl empty">⏳<span>…</span></div>').join('')}</div>${k<r.n&&r.host?`<button class="btn" onclick="fillAI()">🤖 ${t('fill',r.n-k)}</button>`:''}${r.solo?'':`<a class="btn ghost" href="sms:?&body=${encodeURIComponent(inviteText())}">📩 ${t('invite')}</a><button class="btn ghost" id="inv" onclick="copyInv()">${t('copyInv')}</button>`}<p class="muted">${k<r.n?t('wait'):t('starting')}</p></div>`)}
 
 /* ---------- real online rooms (shared db) ---------- */
-const MP={code:null,host:false,members:[],room:null,unsubs:[],r:null,starting:false};
-const mpClean=()=>{MP.unsubs.forEach(u=>{try{u()}catch(e){}});MP.unsubs=[]};
+const MP={code:null,host:false,members:[],room:null,unsubs:[],r:null,starting:false,hb:null};
+const mpClean=()=>{MP.unsubs.forEach(u=>{try{u()}catch(e){}});MP.unsubs=[];clearInterval(MP.hb);MP.hb=null};
 const mkCode=()=>Array.from({length:5},()=>'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.floor(Math.random()*32)]).join('');
 const cleanName=s=>String(s||'').replace(/[^\w \-\u00c0-\u00ff]/g,'').trim().slice(0,12)||'Player';
 async function mpCreate(r){RUN++;clearT();mpClean();const code=mkCode();MP.code=code;MP.host=true;MP.r=r;MP.starting=false;
 try{await NET.db.doc('rooms/'+code).set({name:r.name,n:r.n,chat:r.chat,priv:!!r.priv,pcode:r.code||'',host:NET.uid,status:'lobby',cnt:1,ts:Date.now()});
-await NET.db.doc(`rooms/${code}/members/${NET.uid}`).set({name:CFG.name,emo:CFG.avatar,ts:Date.now()});mpLobby()}catch(e){lobby(r)}}
+ await roomCall('join',code,{name:CFG.name,emo:CFG.avatar,code:r.code||''});mpLobby()}catch(e){lobby(r)}}
 const roomMatch=(r,qs)=>{qs=String(qs||'').trim().toLowerCase();return !qs||String(r.name||'').toLowerCase().includes(qs)||String(r.id||'').toLowerCase().includes(qs)};
 const savedRoom=()=>{try{const x=JSON.parse(localStorage.getItem('clicque_room')||'null');return x&&Date.now()-x.ts<6*3600*1000?x:null}catch(e){return null}};
 const saveRoom=code=>{try{localStorage.setItem('clicque_room',JSON.stringify({code,ts:Date.now()}))}catch(e){}};
 const clearSaved=()=>{try{localStorage.removeItem('clicque_room')}catch(e){}};
+const roomCall=(action,code,details={})=>window.__clicqueRooms?window.__clicqueRooms.call(action,code,details):Promise.reject(new Error('Room server functions are not installed yet'));
+const inviteHref=(code,pass='')=>{const u=new URL(location.href);u.hash='';u.search='';u.searchParams.set('room',code);if(pass)u.searchParams.set('code',pass);return u.href};
+async function joinRoomLink(){const u=new URL(location.href),id=u.searchParams.get('room'),code=u.searchParams.get('code')||'';if(!id)return;u.searchParams.delete('room');u.searchParams.delete('code');history.replaceState(null,'',u.pathname+u.search+u.hash);if(!await netInit())return online();await mpJoin(id,true,code)}
 function drawRooms(){const el=q('rl');if(!el)return;const rs=(MP.rooms||[]).filter(r=>roomMatch(r,MP.q));
 el.innerHTML=rs.length?rs.map(r=>`<div class="card"><b>${esc(r.name)}</b> <small class="muted">#${esc(r.id)}</small> ${r.priv?'🔒':'🌍'}<p class="muted">${t('roomLine',r.cnt||1,r.n,r.chat)}</p>${r.priv&&r.pcode?`<input id="rc_${esc(r.id)}" placeholder="${t('code')}" maxlength="8">`:''}<button class="btn" onclick="mpJoin('${esc(r.id)}')">${t('joinBtn')}</button></div>`).join(''):`<p class="muted">${t('noRooms')}</p>`}
 function joinReal(){RUN++;clearT();mpClean();MP.rooms=[];MP.q='';
 screen(hdr(t('join'),'online()')+`<input id="rs" placeholder="${t('searchPh')}" maxlength="24" oninput="MP.q=this.value;drawRooms()" style="margin-bottom:8px"><h3>${t('liveRooms')}</h3><div id="rl"></div>`);const lim=Date.now()-30*60000;
 MP.unsubs.push(NET.db.collection('rooms').where('status','==','lobby').onSnapshot(s=>{MP.rooms=s.docs.map(d=>({id:d.id,...d.data()})).filter(r=>r.ts>lim&&(r.cnt||1)<r.n);drawRooms()},e=>{}))}
 async function resumeRoom(){const sv=savedRoom();if(!sv)return;try{const s=await NET.db.doc('rooms/'+sv.code).get();if(!s.exists||['closed','done'].includes(s.data().status)){clearSaved();return online()}
-const r=s.data();MP.code=sv.code;MP.host=false;MP.starting=false;MP.r={name:r.name,n:r.n,chat:r.chat,priv:r.priv,code:r.pcode};
-await NET.db.doc(`rooms/${sv.code}/members/${NET.uid}`).set({name:CFG.name,emo:CFG.avatar,ts:Date.now()});if(r.status==='playing')clientRun(sv.code);else mpLobby()}catch(e){clearSaved();online()}}
+const r=s.data();MP.code=sv.code;MP.host=r.host===NET.uid;MP.starting=false;MP.r={name:r.name,n:r.n,chat:r.chat,priv:r.priv,code:r.pcode};
+if(r.status==='playing'&&MP.host){await roomCall('leave',sv.code);await roomCall('join',sv.code,{name:CFG.name,emo:CFG.avatar,code:r.pcode||''});MP.host=false;mpLobby();return}
+await roomCall('join',sv.code,{name:CFG.name,emo:CFG.avatar,code:r.pcode||''});if(r.status==='playing')clientRun(sv.code);else mpLobby()}catch(e){clearSaved();online()}}
 function clWatch(){const e=q('hoff');if(!e||!CL.st)return;e.innerHTML=(CL.st.hb&&!CL.st.over&&Date.now()-CL.lastSeen>50000)?`<div class="toast" style="margin-bottom:8px">⚠️ ${t('hostOff')}</div>`:''}
-async function mpJoin(id){try{const s=await NET.db.doc('rooms/'+id).get();if(!s.exists)return;const r=s.data();
-if(r.priv&&r.pcode){const el=q('rc_'+id);if(!el||el.value.trim()!==r.pcode){if(el)el.style.borderColor='var(--ac)';return}}
-MP.code=id;MP.host=false;MP.starting=false;MP.r={name:r.name,n:r.n,chat:r.chat,priv:r.priv,code:r.pcode};
-await NET.db.doc(`rooms/${id}/members/${NET.uid}`).set({name:CFG.name,emo:CFG.avatar,ts:Date.now()});saveRoom(id);mpLobby()}catch(e){}}
+async function mpJoin(id,fromInvite=false,inviteCode=''){try{const s=await NET.db.doc('rooms/'+id).get();if(!s.exists)return;const r=s.data();
+let code=r.pcode||'';if(r.priv&&code){const el=q('rc_'+id);if(fromInvite)code=inviteCode;else code=el?el.value.trim():'';if(code!==r.pcode){if(el)el.style.borderColor='var(--ac)';if(fromInvite)online();return}}
+await roomCall('join',id,{name:CFG.name,emo:CFG.avatar,code});MP.code=id;MP.host=r.host===NET.uid;MP.starting=false;MP.r={name:r.name,n:r.n,chat:r.chat,priv:r.priv,code:r.pcode};saveRoom(id);mpLobby()}catch(e){if(fromInvite)online()}}
 function mpLobby(){mpClean();const db=NET.db,code=MP.code;
-MP.unsubs.push(db.collection(`rooms/${code}/members`).onSnapshot(s=>{MP.members=s.docs.map(d=>({uid:d.id,...d.data()})).sort((a,b)=>a.ts-b.ts);if(MP.host)db.doc('rooms/'+code).update({cnt:MP.members.length}).catch(()=>{});drawMP()},e=>{}));
-MP.unsubs.push(db.doc('rooms/'+code).onSnapshot(s=>{if(!s.exists)return;MP.room=s.data();if(!MP.host&&MP.room.status==='playing')clientRun(code);else if(MP.room.status==='closed'&&!MP.host){mpLeave()}},e=>{}))}
+MP.hb=setInterval(()=>roomCall('heartbeat',code,{name:CFG.name,emo:CFG.avatar,code:MP.r?.code||''}).catch(()=>{}),15000);roomCall('heartbeat',code,{name:CFG.name,emo:CFG.avatar,code:MP.r?.code||''}).catch(()=>{});
+MP.unsubs.push(db.collection(`rooms/${code}/members`).onSnapshot(s=>{MP.members=s.docs.map(d=>({uid:d.id,...d.data()})).sort((a,b)=>a.ts-b.ts);drawMP()},e=>setTimeout(()=>{if(MP.code===code)mpLobby()},2500)));
+MP.unsubs.push(db.doc('rooms/'+code).onSnapshot(s=>{if(!s.exists){mpLeave();return}MP.room=s.data();MP.host=MP.room.host===NET.uid;if(MP.room.status==='playing'&&!MP.host&&!G?.mp)clientRun(code);else if(MP.room.status==='lobby'&&G?.mp){G=null;mpLobby()}else if(MP.room.status==='closed')mpLeave();else drawMP()},e=>setTimeout(()=>{if(MP.code===code)mpLobby()},2500)))}
 function drawMP(){if(!MP.r||G&&G.mp)return;const r=MP.r,ms=MP.members,k=ms.length;
-screen(hdr(esc(r.name),'mpLeave()')+`<div class="card"><p class="muted">${r.priv?'🔒 '+t('privL'):'🌍 '+t('pub')} · ${r.chat?t('sec',r.chat):t('noChat')} · ${t('online')}</p><h3>${k}/${r.n}</h3><p class="muted">${t('roomCodeLbl')}: <b>${esc(MP.code)}</b></p><div class="grid">${Array.from({length:r.n},(_,i)=>ms[i]?`<div class="pl">${esc(AV.includes(ms[i].emo)?ms[i].emo:'🧑')}<span>${esc(cleanName(ms[i].name))}</span></div>`:'<div class="pl empty">⏳<span>…</span></div>').join('')}</div>${MP.host?`<button class="btn" onclick="mpStart()">▶ ${t('startNow')}</button>`:''}<a class="btn ghost" href="sms:?&body=${encodeURIComponent(t('inviteMsg',r.name+' #'+MP.code,r.priv&&r.code?t('codePre',r.code):'',location.href))}">📩 ${t('invite')}</a><p class="muted">${k<r.n?t('wait'):t('starting')}</p></div>`);
+screen(hdr(esc(r.name),'mpLeave()')+`<div class="card"><p class="muted">${r.priv?'🔒 '+t('privL'):'🌍 '+t('pub')} · ${r.chat?t('sec',r.chat):t('noChat')} · ${t('online')}</p><h3>${k}/${r.n}</h3><p class="muted">${t('roomCodeLbl')}: <b>${esc(MP.code)}</b></p><div class="grid">${Array.from({length:r.n},(_,i)=>ms[i]?`<div class="pl">${esc(AV.includes(ms[i].emo)?ms[i].emo:'🧑')}<span>${esc(cleanName(ms[i].name))}</span></div>`:'<div class="pl empty">⏳<span>…</span></div>').join('')}</div>${MP.host?`<button class="btn" onclick="mpStart()">▶ ${t('startNow')}</button>`:''}<a class="btn ghost" href="sms:?&body=${encodeURIComponent(t('inviteMsg',r.name+' #'+MP.code,r.priv&&r.code?t('codePre',r.code):'',inviteHref(MP.code,r.priv?r.code:'')))}">📩 ${t('invite')}</a><button class="btn ghost" onclick="navigator.clipboard.writeText(inviteHref(MP.code,MP.r.priv?MP.r.code:''))">🔗 Copy join link</button><p class="muted">${k<r.n?t('wait'):t('starting')}</p></div>`);
 if(MP.host&&k>=r.n&&!MP.starting)mpStart()}
 async function mpStart(){if(MP.starting&&MP.r._started)return;MP.starting=true;const me=NET.uid;const ms=[...MP.members].sort((a,b)=>a.uid===me?-1:b.uid===me?1:a.ts-b.ts).slice(0,MP.r.n);if(!ms.length)return;
 const cn=castNames();L={r:{...MP.r,mp:MP.code,host:true},nm:cn.nm,em:cn.em,ppl:ms.map(m=>({name:cleanName(m.name),emo:AV.includes(m.emo)?m.emo:'🧑',uid:m.uid}))};
 while(L.ppl.length<MP.r.n)addP();MP.r._started=true;
-try{await NET.db.doc('rooms/'+MP.code).update({status:'playing',ts:Date.now()})}catch(e){}go()}
-async function mpLeave(){clearSaved();clearInterval(CL.wd);try{if(MP.code&&NET.db){if(MP.host)await NET.db.doc('rooms/'+MP.code).update({status:'closed'});else await NET.db.doc(`rooms/${MP.code}/members/${NET.uid}`).delete()}}catch(e){}mpClean();MP.code=null;G=null;menu()}
+try{await roomCall('start',MP.code)}catch(e){MP.r._started=false;MP.starting=false;return}go()}
+async function mpLeave(){const code=MP.code;clearSaved();clearInterval(CL.wd);try{if(code&&NET.db)await roomCall('leave',code)}catch(e){}mpClean();MP.code=null;MP.host=false;G=null;menu()}
 
 /* ---------- remote player view ---------- */
 const BAD=new RegExp('\\b(?:fuck\\w*|shit\\w*|bitch\\w*|asshole|cunt|nigg\\w+|fag\\w*|retard\\w*|puta|mierda|pendejo|cabr[oó]n|merde|putain|connard|salope|scheisse|scheiße|arschloch|fotze|porra|caralho)\\b|傻逼|操你','gi');
@@ -385,9 +389,10 @@ async function report(by,txt){BLK.add(by);try{await NET.db.collection('reports')
 const CL={st:null,msgs:[],voted:0,round:-1};
 function safeHTML(h){const doc=new DOMParser().parseFromString('<body>'+h+'</body>','text/html'),ok=new Set(['DIV','SPAN','B','EM','H2','H3','P','BR']);
 const walk=n=>{[...n.childNodes].forEach(c=>{if(c.nodeType===1){if(!ok.has(c.tagName)){c.remove();return}[...c.attributes].forEach(a=>{if(a.name!=='class')c.removeAttribute(a.name)});walk(c)}})};walk(doc.body);return doc.body.innerHTML}
-function clientRun(code){RUN++;clearT();mpClean();CL.msgs=[];CL.voted=0;CL.round=-1;CL.st=null;clearInterval(CL.wd);CL.lastSeen=Date.now();CL.wd=setInterval(clWatch,5000);saveRoom(code);
+function clientRun(code){RUN++;clearT();mpClean();MP.hb=setInterval(()=>roomCall('heartbeat',code,{name:CFG.name,emo:CFG.avatar,code:MP.r?.code||''}).catch(()=>{}),15000);roomCall('heartbeat',code,{name:CFG.name,emo:CFG.avatar,code:MP.r?.code||''}).catch(()=>{});CL.msgs=[];CL.voted=0;CL.round=-1;CL.st=null;clearInterval(CL.wd);CL.lastSeen=Date.now();CL.wd=setInterval(clWatch,5000);saveRoom(code);
 screen(hdr('CLICQUE','mpLeave()')+'<div id="hoff"></div><div id="ro" class="stage"></div><div id="th"></div><div id="pn" class="card"></div>');const db=NET.db;
-MP.unsubs.push(db.doc(`rooms/${code}/live/state`).onSnapshot(s=>{if(s.exists){CL.st=s.data();CL.lastSeen=Date.now();clRender()}},e=>{}));
+MP.unsubs.push(db.doc('rooms/'+code).onSnapshot(s=>{if(!s.exists){clearSaved();mpLeave();return}MP.room=s.data();MP.host=MP.room.host===NET.uid;if(MP.room.status==='lobby'){clearInterval(CL.wd);G=null;mpLobby()}else if(MP.room.status==='closed'){mpLeave()}},e=>setTimeout(()=>{if(MP.code===code)clientRun(code)},2500)));
+MP.unsubs.push(db.doc(`rooms/${code}/live/state`).onSnapshot(s=>{if(s.exists){CL.st=s.data();CL.lastSeen=Date.now();clRender()}},e=>setTimeout(()=>{if(MP.code===code)clientRun(code)},2500)));
 MP.unsubs.push(db.collection(`rooms/${code}/chat`).orderBy('ts').limit(400).onSnapshot(s=>{CL.msgs=s.docs.map(d=>({id:d.id,...d.data()}));clChat()},e=>{}))}
 function clRender(){const st=CL.st;if(!st||!q('ro'))return;if(st.over)clearSaved();
 q('ro').innerHTML=`<div class="tick">● LIVE · ${t('round',(st.chat&&st.chat.round)||1)} · ${(st.ro||[]).filter(p=>p.alive).length}/${(st.ro||[]).length}</div>`+(st.ro||[]).map(p=>`<div class="pl ${p.alive?'':'dead'}" data-i="${p.id}">${esc(p.emo)}<span>${esc(p.name)}</span><div class="eq"><i></i><i></i><i></i><i></i></div></div>`).join('');
@@ -458,7 +463,7 @@ castInit();
 screen(hdr('CLICQUE',G.mp?'mpLeave()':'menu()')+'<div id="ro" class="stage"></div><div id="th"></div><div id="pn" class="card"></div><div style="height:104px"></div><div id="dock"><div id="shp"></div><div id="shb"></div></div>');
 if(G.mp)mpHostInit();netInit().then(ok=>{if(ok&&NET.db)NET.db.doc('meta/playbook').get().then(s=>{if(s.exists&&Array.isArray(s.data().tips))PB=s.data().tips.filter(x=>typeof x==='string').slice(0,14)}).catch(()=>{})}).catch(()=>{});
 renderShowBar();castWarm();loop().catch(e=>{if(e!=='x')console.error(e)})}
-function mpHostInit(){const db=NET.db,c=G.mp.code;mpClean();NET.ref=db.doc(`rooms/${c}/live/state`);NET.st={html:'',th:null,ro:[],pk:null,chat:{on:false,round:0,deadline:0},over:false,hb:window.__clicqueShim?1:0};if(window.__clicqueShim)tick(()=>mpPush({}),15000);NET.votes={};
+function mpHostInit(){const db=NET.db,c=G.mp.code;mpClean();MP.hb=setInterval(()=>roomCall('heartbeat',c,{name:CFG.name,emo:CFG.avatar,code:MP.r?.code||''}).catch(()=>{}),15000);roomCall('heartbeat',c,{name:CFG.name,emo:CFG.avatar,code:MP.r?.code||''}).catch(()=>{});NET.ref=db.doc(`rooms/${c}/live/state`);NET.st={html:'',th:null,ro:[],pk:null,chat:{on:false,round:0,deadline:0},over:false,hb:window.__clicqueShim?1:0};if(window.__clicqueShim)tick(()=>mpPush({}),15000);NET.votes={};
 MP.unsubs.push(db.collection(`rooms/${c}/votes`).onSnapshot(s=>{s.docs.forEach(d=>{NET.votes[d.id]=d.data()});if(NET.onVote)NET.onVote()},e=>{}));
 MP.unsubs.push(db.collection(`rooms/${c}/chat`).onSnapshot(s=>{s.docChanges().forEach(ch=>{if(ch.type!=='added')return;const d=ch.doc.data();if(!G||d.by==='host'||d.g!==G.gid||d.r!==G.n)return;const p=G.P.find(x=>x.uid===d.by);if(p&&p.alive&&G.chatOn)humanSaid(p,String(d.txt||'').slice(0,80),true)})},e=>{}))}
 
