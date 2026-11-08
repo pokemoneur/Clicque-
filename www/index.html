@@ -187,7 +187,11 @@ disc:['💬 Discussion','💬 Debate','💬 Discussion','💬 Discussão','💬 
 say:['Say something…','Escribe algo…','Dis quelque chose…','Diga algo…','Schreib etwas…','说点什么…'],
 spect:['You are spectating','Estás de espectador','Tu es spectateur','Você está assistindo','Du schaust zu','你正在观战'],
 send:['Send','Enviar','Envoyer','Enviar','Senden','发送'],
-ready:['I’m ready to vote ›','Estoy listo para votar ›','Prêt à voter ›','Pronto para votar ›','Bereit zur Abstimmung ›','我准备好投票 ›'],
+ready:['I’m ready ›','Estoy listo ›','Prêt ›','Pronto ›','Bereit ›','我准备好了 ›'],
+readyWaiting:['{0}/{1} ready · phase advances above half','{0}/{1} listos · la fase avanza al superar la mitad','{0}/{1} prêts · la phase avance au-delà de la moitié','{0}/{1} prontos · a fase avança acima da metade','{0}/{1} bereit · Phase wechselt bei mehr als der Hälfte','{0}/{1} 人准备好 · 超过一半后进入下一阶段'],
+killSelect:['🎯 The Killcard selected {0} selector(s).','🎯 La Killcard eligió {0} selector(es).','🎯 La Killcard a choisi {0} sélectionneur(s).','🎯 A Killcard escolheu {0} seletor(es).','🎯 Die Killcard wählte {0} Abstimmer.','🎯 Killcard 选出了 {0} 名决定者。'],
+killVote:['🃏 Killcard: choose one player to eliminate','🃏 Killcard: elige a quién eliminar','🃏 Killcard : choisis qui éliminer','🃏 Killcard: escolha quem eliminar','🃏 Killcard: Wähle eine Person zum Rauswurf','🃏 Killcard：选择一名淘汰对象'],
+killOut:['Killcard eliminated: {0}','La Killcard eliminó a: {0}','Élimination Killcard : {0}','Eliminação Killcard: {0}','Killcard schloss aus: {0}','Killcard 淘汰了：{0}'],
 skipDemo:['skip (demo) ›','saltar (demo) ›','passer (démo) ›','pular (demo) ›','überspringen (Demo) ›','跳过（演示）›'],
 typing:['{0} is typing…','{0} está escribiendo…','{0} écrit…','{0} está digitando…','{0} tippt…','{0} 正在输入…'],
 noVote:['no vote = random pick','sin voto = elección al azar','sans vote = choix aléatoire','sem voto = escolha aleatória','keine Stimme = Zufallswahl','不投票 = 随机选择'],
@@ -456,7 +460,7 @@ const al_=b=>A().filter(p=>p!==b);
 function go(){RUN++;clearT();AI.name=cap(t('g_a'));const ao=shuffle(ARCH.map((x,i)=>i));let bi=0;
 G={r:L.r,mp:L.r.mp?{code:L.r.mp}:null,gid:Date.now(),P:L.ppl.map((p,i)=>{const hum=p.uid?p.uid===NET.uid:i==0,rem=!!p.uid&&p.uid!==NET.uid,o={id:i,name:p.name,emo:p.emo,alive:true,hum,rem,uid:p.uid||null,pers:null};
 if(!hum&&!rem){const pr=mkProf(ao[bi++]);o.prof=pr;o.pers=pr.pers;o.bio={age:18+Math.floor(Math.random()*21),job:rnd(JOBS),city:rnd(CITIES),quirk:rnd(QUIRKS),style:`${pr.hu}; slang level ${pr.sl}/100`,rel:[]}}return o}),
-n:0,deck:shuffle(ROUNDS),last:'',revived:false,lastOut:null,R:null,talked:0,acc:{},accBy:{},lastAcc:{},made:{},def:{},msgs:{},rmsgs:{},pub:[],intent:{},aff:{},cnt:0,pend:[],q:[],log:[],said:new Set(),story:[],racc:{},revCount:0,lastRev:0,endChat:null,lessons:[],ql:0,late:false,aiBackoff:0,bp:null,starve:0,rels:[]};
+n:0,deck:shuffle(ROUNDS),last:'',killcardDone:false,revived:false,lastOut:null,R:null,talked:0,acc:{},accBy:{},lastAcc:{},made:{},def:{},msgs:{},rmsgs:{},pub:[],intent:{},aff:{},cnt:0,pend:[],q:[],log:[],said:new Set(),story:[],racc:{},revCount:0,lastRev:0,endChat:null,lessons:[],ql:0,late:false,aiBackoff:0,bp:null,starve:0,rels:[]};
 const bots=shuffle(G.P.filter(p=>!isH(p)));
 for(let i=0;i+1<bots.length&&i<6;i+=2){const type=rnd(Object.keys(RELS)),a=bots[i],b=bots[i+1];G.rels.push({a,b,type});a.bio.rel.push(`${b.name} (${RELS[type]})`);b.bio.rel.push(`${a.name} (${RELS[type]})`)}
 castInit();
@@ -537,7 +541,8 @@ gameEvent('votes',{votes,secret,mode,picks});return{counts,votes,to}}
 const bd=(r,secret)=>`<div class="bd">${secret?Object.entries(r.counts).filter(e=>e[1]>0).map(([id,n])=>`<span>${P(id).emo} ${P(id).name}: ${n}×</span>`).join(''):r.votes.map(x=>`<span>${x.v.emo} ${x.v.name} → ${x.c.emo} ${x.c.name}${x.why?' <em>“'+x.why+'”</em>':''}</span>`).join('')}</div>`;
 const grid=nm=>`<div class="grid">${nm.map(c=>`<div class="pl">${c.emo}<span>${c.name}</span></div>`).join('')}</div>`;
 async function intro(ti,de,b,rx=''){panel(`<span class="badge">${b||t('round',G.n)}</span><h2>${ti}</h2><p>${de}</p>${rx}`);await sleep(rx?3000:2300)}
-async function elim(p,extra=''){learn(p);p.alive=false;G.lastOut=p;const rx=gameEvent('eliminated',p);roster();await cont(`<div class="big">${p.emo}</div><h2>${p.hum?t('youOut'):t('out',p.name)}</h2>${extra}${rxHTML(rx)}${p.hum?`<p class="muted">${t('keepVote')}</p>`:''}`)}
+async function elim(p,extra=''){return elimMany([p],extra)}
+async function elimMany(ps,extra=''){const outs=ps.filter(p=>p&&p.alive);outs.forEach(p=>{learn(p);p.alive=false});G.lastOut=outs[outs.length-1]||null;const rxs=outs.flatMap(p=>gameEvent('eliminated',p));roster();const heading=outs.length===1?(outs[0].hum?t('youOut'):t('out',outs[0].name)):outs.map(p=>p.hum?t('youOut'):t('out',p.name)).join(' · ');await cont(`<div class="big">${outs.map(p=>p.emo).join(' ')}</div><h2>${heading}</h2>${extra}${rxHTML(rxs)}${outs.some(p=>p.hum)?`<p class="muted">${t('keepVote')}</p>`:''}`)}
 /* clear winner = strictly ahead AND at least a third of the votes; otherwise runoff, then the AI decides */
 const clearLead=(r,cs,total)=>{const s=cs.map(c=>r.counts[c.id]).sort((a,b)=>b-a),need=total<=2?1:Math.max(2,Math.ceil(total/3));return total>0&&s[0]>(s[1]||0)&&s[0]>=need};
 function runoffC(r,cs){const sorted=[...cs].sort((a,b)=>r.counts[b.id]-r.counts[a.id]),thr=Math.max(1,r.counts[sorted[Math.min(2,sorted.length-1)].id]);
@@ -734,11 +739,13 @@ await wait(Math.min(3800,900+m.text.length*34+Math.random()*700));
 if(G.chatId!==my||!G.chatOn||!q('lg'))break;
 if(ty)ty.textContent='';emit(m);
 await wait((m.fast?1900+Math.random()*1500:3800+Math.random()*3800)*TALK())}}
-function chat(){return new Promise(res=>{const me=G.P.find(p=>p.hum),my=G.chatId={};let tl=G.endChat?44:chatSecs();
+function chat(){return new Promise(res=>{const me=G.P.find(p=>p.hum),my=G.chatId={};let tl=G.endChat?44:chatSecs(),readyDone=false,readySet=new Set(),readyTimer=0,readyRef=null,finishChat;
 G.chatOn=true;G.talked=0;G.cnt=0;G.rmsgs={};G.intent={};G.last=null;G.pend=[];G.q=[];G.starve=0;G.late=false;if(!G.endChat)gameEvent('round_start');else G.talked=1;G.evq=[];
-panel(`<span class="badge">${G.endChat?'🎤 '+t('endChatT'):t('round',G.n)}</span><h3>${t('disc')}</h3><div id="lg" class="log"></div><div id="typ" class="muted" style="min-height:1.4em"></div><div class="row"><input id="ms" placeholder="${me.alive?t('say'):t('spect')}" ${me.alive?'':'disabled'} maxlength="80"><button class="btn" id="sd" ${me.alive?'':'disabled'}>${t('send')}</button></div><p class="muted">⏱ <b id="tt">${tl}</b>s${G.mp?'':` · <a href="#" id="sk">${G.r.solo?t('ready'):t('skipDemo')}</a>`}</p>`);
-mpPush({chat:{on:true,round:G.n,deadline:Date.now()+tl*1000,end:!!G.endChat}});
-let cid=0;const end=()=>{storyChat();G.chatOn=false;if(cid)clearInterval(cid);mpPush({chat:{on:false,round:G.n,deadline:0}});res()};
+panel(`<span class="badge">${G.endChat?'🎤 '+t('endChatT'):t('round',G.n)}</span><h3>${t('disc')}</h3><div id="lg" class="log"></div><div id="typ" class="muted" style="min-height:1.4em"></div><div class="row"><input id="ms" placeholder="${me.alive?t('say'):t('spect')}" ${me.alive?'':'disabled'} maxlength="80"><button class="btn" id="sd" ${me.alive?'':'disabled'}>${t('send')}</button></div><p class="muted">⏱ <b id="tt">${tl}</b>s${G.mp&&me.alive?` · <button class="btn ghost" id="rd">${t('ready')}</button>`:''}${!G.mp?` · <a href="#" id="sk">${G.r.solo?t('ready'):t('skipDemo')}</a>`:''}</p><p class="muted" id="rdy"></p>`);
+const chatInfo={on:true,round:G.n,deadline:Date.now()+tl*1000,end:!!G.endChat,ready:[]};
+if(G.mp){mpPush({chat:chatInfo});readyRef=NET.db.collection(`rooms/${G.mp.code}/ready`);const refreshReady=async()=>{try{const s=await readyRef.get(),xs=s.docs.filter(d=>d.data().g===G.gid&&d.data().r===G.n).map(d=>d.id);readySet=new Set(xs);if(readySet.has(NET.uid)){const b=q('rd');if(b)b.textContent='✓ '+t('ready')}const el=q('rdy');if(el)el.textContent=t('readyWaiting',readySet.size,A().length);chatInfo.ready=xs;const need=Math.floor(A().length/2)+1;if(!readyDone&&readySet.size>=need)finishChat();else mpPush({chat:chatInfo})}catch(e){}};
+ const unsub=readyRef.onSnapshot(refreshReady,()=>{});readyTimer=setInterval(refreshReady,2000);TM.push(readyTimer);const b=q('rd');if(b)b.onclick=async()=>{try{await readyRef.doc(NET.uid).set({g:G.gid,r:G.n,ts:Date.now()});await refreshReady()}catch(e){}}}
+let cid=0;const end=finishChat=()=>{if(readyDone)return;readyDone=true;storyChat();G.chatOn=false;if(cid)clearInterval(cid);if(readyTimer)clearInterval(readyTimer);mpPush({chat:{on:false,round:G.n,deadline:0,ready:[]}});res()};
 cid=tick(()=>{tl--;const e=q('tt');if(e)e.textContent=tl;G.late=tl<=25;if(tl<=0)end()},1000);
 loopTalk(my);
 const send=()=>{const i=q('ms'),v=i.value.trim();if(!v||!me.alive)return;i.value='';humanSaid(me,v,false)};
@@ -776,6 +783,7 @@ panel(`<h3>🛟 ${t('saves',actor.name,c.name)}</h3>${ch()}`);await sleep(2000);
 const out=al.find(p=>!saved.has(p.id));
 await elim(out,`<p class="muted">${t('unsaved')}: ${out.emo} ${out.name}</p>`+ch())}
 const ROUNDS=[
+{id:'killcard',run:async()=>{const a=A(),count=a.length>=7&&Math.random()<.5?2:1,picks=[];const selected=shuffle(a).slice(0,count);G.killcardDone=true;await cont(`<h3>🎯 ${t('killSelect',count)}</h3>${grid(selected)}`);for(const actor of selected){let target;if(actor.hum){target=(await hPick(t('killVote'),a.filter(p=>p!==actor))).c}else if(actor.rem){const got=await remoteAsk([actor],t('killVote'),()=>a.filter(p=>p!==actor));target=a.find(p=>p.id===got[actor.uid])||rnd(a.filter(p=>p!==actor))}else target=decide(actor,a.filter(p=>p!==actor),'out',true).c;picks.push({actor,target})}const outs=[...new Set(picks.map(x=>x.target))];const detail=`<p>${t('killOut',outs.map(p=>`${p.emo} ${esc(p.name)}`).join(' &amp; '))}</p><div class="bd">${picks.map(x=>`<span>🃏 ${esc(x.actor.name)} → ${x.target.emo} ${esc(x.target.name)}</span>`).join('')}</div>`;await elimMany(outs,detail)}} ,
 {id:'secret',run:async()=>{const x=await elimVote({voters:A(),cands:A(),prompt:t('p_secret'),secret:1});await elim(x.c,x.html)}},
 {id:'public',run:async()=>{const x=await elimVote({voters:A(),cands:A(),prompt:t('p_public')});await elim(x.c,x.html)}},
 {id:'chain',run:saveChain},
@@ -789,8 +797,9 @@ const ROUNDS=[
 {id:'ghostV',dead:1,run:async()=>{const x=await elimVote({voters:D(),cands:A(),prompt:t('p_ghost')});await elim(x.c,x.html)}},
 {id:'jury',dead:1,run:async()=>{const gs=rnd([['players','dead'],['players','ai'],['dead','ai']]);await announce(gs,'willVote',t('t_jury'));await mixed(gs.flatMap(grp))}},
 {id:'global',run:()=>mixed([...A(),...D(),AI])}];
-function pickRound(){const ok=r=>(!r.dead||D().length)&&(!r.timed||voteTimed());let c=G.deck.filter(ok);
-if(!c.length){G.deck=shuffle(ROUNDS.filter(r=>r.id!==G.last));c=G.deck.filter(ok)}
+function pickRound(){const ok=r=>(!r.dead||D().length)&&(!r.timed||voteTimed());if(A().length<7)G.deck=G.deck.filter(r=>r.id!=='killcard');let c=G.deck.filter(ok);
+if(!c.length){G.deck=shuffle(ROUNDS.filter(r=>r.id!==G.last&&(A().length>=7||r.id!=='killcard')));c=G.deck.filter(ok)}
+if(!G.killcardDone&&A().length>=5&&c.some(r=>r.id==='killcard'))return G.deck.find(r=>r.id==='killcard');
 const r=c[0];G.deck=G.deck.filter(x=>x!==r);G.last=r.id;return r}
 async function revival(){th({t:t('t_revival'),d:t('d_revival')});await intro(t('t_revival'),t('d_revival'),t('bonus'));
 const gs=rnd([['players','dead','ai'],['players','ai'],['dead','ai'],['players','dead']]);await announce(gs,'willRev',t('t_revival'));
