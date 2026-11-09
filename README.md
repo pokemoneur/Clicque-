@@ -20,8 +20,7 @@ and the Supabase layer against a mock (`npm test`).
 - `tests/shim.test.js`: tests for the Supabase layer
 
 ## Setup in order
-1. **Supabase:** create a free project at supabase.com. Open *SQL Editor*, paste `supabase/schema.sql`, run it.
-   Then *Authentication > Providers*: turn on **Anonymous sign-ins**.
+1. **Supabase:** create a project at supabase.com and enable **Anonymous sign-ins**. The checked-in `supabase/schema.sql` is an early development schema, not a production-ready multiplayer setup. Read [PWA launch checklist](docs/PWA-LAUNCH-CHECKLIST.md) before applying it to a live project.
 2. **Keys:** *Project Settings > API*: copy the Project URL and the `anon` key into `www/config.js`.
 3. **AI chat server:** install the Supabase CLI, then in this folder:
    ```
@@ -38,12 +37,12 @@ and the Supabase layer against a mock (`npm test`).
    ```
    Then schedule it weekly (Supabase Dashboard > Integrations > Cron, call the same URL with the same header).
    The game reads the tips from the row `meta/playbook` and falls back to a built-in playbook if it is missing.
-4. **Install and test in a browser:**
+4. **Prepare the browser build:**
    ```
    npm install
    npm test
    npm run vendor
-   npx serve www        # open the printed address on two devices to test online rooms
+   npx serve www        # open the printed address to check the local web build
    ```
 5. **Make the native apps:**
    ```
@@ -84,6 +83,8 @@ See `NETLIFY.md`: configure Supabase, paste the two keys into `www/config.js`, t
 - **From the internet:** only through the optional weekly server job above, never live from the game page.
 
 ## Known limits of this first version
+- The web client calls `clicque_room_join`, `clicque_room_heartbeat`, `clicque_room_leave`, and `clicque_room_start`, but their SQL definitions are not present in the maintained `supabase/` source. Online rooms need those procedures deployed; otherwise they will fail.
+- The current `docs` read policy allows every signed-in player to read every document, including private-room documents. The insert policy also permits broad writes under room paths. Replace these development rules with tested, least-privilege room policies before enabling online play for people outside a trusted pilot.
 - Rules are lenient (any signed-in player can create rooms). Tighten them before a big launch.
 - The room's host runs the game. If the host closes the app, the game ends.
 - No accounts, friends list, purchases or ads yet.
