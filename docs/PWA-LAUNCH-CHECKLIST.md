@@ -9,6 +9,9 @@ Status reviewed against the repository on 9 November 2026. “In repository” m
 - [x] GitHub Actions workflow that publishes the www/ folder to GitHub Pages.
 - [x] Supabase client adapter and server-side AI function scaffolds.
 - [x] Earlier requested dialogue improvements: more responsive AI conversation and a warmer end-of-game exchange.
+- [x] Added a clearer, staged round reveal, a short pause before elimination names appear, and concise round-specific dialogue guidance.
+- [x] Fixed missing Killcard title/description translations and prevented the forced Killcard from returning later in the same game.
+- [x] Added a single-player Ready button for eliminated spectators and gated developer controls behind the existing server passcode.
 - [ ] Live PWA installation and update behavior verified on current iOS Safari and Android Chrome devices.
 - [ ] Online multiplayer verified against the currently deployed Supabase project.
 

@@ -70,7 +70,7 @@ The AI players can be written by Claude (Anthropic) or by an NVIDIA-hosted model
 3. Deploy both functions: `supabase functions deploy chat-ai` and `supabase functions deploy admin-config`
 4. Put your NVIDIA key in for the first time, either way:
    - paste `supabase/private/seed-dev-config.sql` in the Supabase SQL editor and run it (it already contains your key; keep that file private), or
-   - open the game address followed by `#dev`, go to Settings > Developer, enter the passcode, choose NVIDIA, the model name and the key, press Save, then Test.
+   - open the game address followed by `#dev`, go to Settings > Developer access, and enter the existing passcode. The controls appear only after the server verifies it. Then choose NVIDIA, the model name and the key, press Save, then Test.
 5. Change or remove the key any time from the same Developer screen. Only the passcode unlocks it. To remove the Developer screen from the game, set `DEV_ENABLED=false` in `www/index.html`.
 Notes: model names on build.nvidia.com change over time, so check the current list; the Claude page link cannot call outside services, so this works in the Netlify and app versions only.
 
