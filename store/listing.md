@@ -2,7 +2,12 @@
 
 **Name:** CLICQUE: Social Elimination
 **Subtitle (iOS, 30 chars):** Chat. Vote. Survive.
-**Short description (Google, 80 chars):** Chat, bluff and vote your friends out in a fast social elimination game.
+**Short description (Google, 80 chars):** Chat, bluff and vote in a quick party game with lively AI players.
+
+**Product promise:** A quick social-deduction party game for friends, with lively AI players when your group is small.
+**Support email:** Not set; choose an address you control before store submission.
+**Domain:** Not set; choose a domain you control before store submission.
+**First release focus:** Solo-first, with private friend rooms as the next step; no public matchmaking in the first release.
 
 ## Full description
 Who do you trust? In CLICQUE, 5 to 10 players chat, accuse, defend and vote one another out, round after round, until only two remain. Then the eliminated players decide who wins.

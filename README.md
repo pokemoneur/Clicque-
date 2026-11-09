@@ -50,7 +50,7 @@ and the Supabase layer against a mock (`npm test`).
    npx cap add android    # needs Android Studio
    npm run ios            # or: npm run android
    ```
-   Change `appId` in `capacitor.config.json` to your own (for example `com.yourname.clicque`) *before* `cap add`.
+The current permanent-style app ID is `com.clicque.game`. If you own a domain, replace this with its reverse-domain form (for example `com.yourdomain.clicque`) before `cap add`; changing it after native projects are created can require migration work.
 6. Generate icons and splash screens: `npx @capacitor/assets generate --iconBackgroundColor '#6a4cf0'` (uses `assets/icon.png`).
 7. Follow the launch checklist document for accounts, store forms, testing and legal.
 

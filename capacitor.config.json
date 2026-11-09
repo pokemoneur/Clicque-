@@ -1,5 +1,5 @@
 {
-  "appId": "com.yourname.clicque",
+  "appId": "com.clicque.game",
   "appName": "CLICQUE",
   "webDir": "www",
   "bundledWebRuntime": false,

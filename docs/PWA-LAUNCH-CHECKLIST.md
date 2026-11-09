@@ -4,6 +4,10 @@ Status reviewed against the repository on 9 November 2026. “In repository” m
 
 ## What is already in the repository
 
+- [x] Product identity draft aligned: CLICQUE: Social Elimination, short listing copy, promise, and solo-first release scope.
+- [x] Supplied glossy Q icon installed as the 1024px master and PWA launcher icon set.
+- [x] Replaced placeholder Capacitor app ID with `com.clicque.game`; replace with an owned-domain ID if desired before creating native projects.
+- [ ] Choose a support email and a domain you control before store submission.
 - [x] Web game, responsive layout, web manifest, service worker, and app icons.
 - [x] Capacitor configuration and iOS/Android dependencies for a later native wrapper.
 - [x] GitHub Actions workflow that publishes the www/ folder to GitHub Pages.
