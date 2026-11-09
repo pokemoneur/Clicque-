@@ -1,5 +1,5 @@
 // Minimal offline cache so the web app installs and opens without a connection (online rooms still need the network).
-const C = 'clicque-v6';
+const C = 'clicque-v8';
 const FILES = ['./', 'index.html', 'platform.js', 'config.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'vendor/supabase.js'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(C).then(c => Promise.allSettled(FILES.map(u => c.add(u)))).then(() => self.skipWaiting()));

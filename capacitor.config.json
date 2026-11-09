@@ -1,0 +1,8 @@
+{
+  "appId": "com.yourname.clicque",
+  "appName": "CLICQUE",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "ios": { "contentInset": "always" },
+  "android": { "allowMixedContent": false }
+}
