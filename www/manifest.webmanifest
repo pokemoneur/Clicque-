@@ -1,6 +1,6 @@
 {
-  "name": "CLICQUE",
-  "short_name": "CLICQUE",
+  "name": "Clique",
+  "short_name": "Clique",
   "description": "Chat. Vote. Survive.",
   "start_url": "./index.html",
   "scope": "./",

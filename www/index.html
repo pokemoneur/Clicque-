@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
-<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="CLICQUE"><meta name="theme-color" content="#6a4cf0"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>CLICQUE</title>
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Clique"><meta name="theme-color" content="#6a4cf0"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Clique</title>
 <style>
 :root{--bg:#f1f0ff;--card:#fff;--ink:#1c1b3a;--mut:#6d6c93;--ac:#e8335a;--ac2:#6a4cf0;--line:#dcdaf5;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1020;--card:#1a1b33;--ink:#f2f2ff;--mut:#9a9cc4;--ac:#ff5a7a;--ac2:#8f74ff;--line:#2c2e52;color-scheme:dark}}
@@ -164,10 +164,10 @@ starting:['Starting…','Empezando…','Démarrage…','Começando…','Starte�
 invite:['Invite by text','Invitar por SMS','Inviter par SMS','Convidar por SMS','Per SMS einladen','短信邀请'],
 copyInv:['Copy invite message','Copiar invitación','Copier l’invitation','Copiar convite','Einladung kopieren','复制邀请'],
 copied:['Copied ✓','Copiado ✓','Copié ✓','Copiado ✓','Kopiert ✓','已复制 ✓'],
-inviteMsg:['Join my CLICQUE room “{0}”! {1}Play here: {2}','Únete a mi sala de CLICQUE “{0}”. {1}Juega aquí: {2}','Rejoins mon salon CLICQUE « {0} » ! {1}Joue ici : {2}','Entre na minha sala CLICQUE “{0}”! {1}Jogue aqui: {2}','Komm in meinen CLICQUE-Raum „{0}“! {1}Hier spielen: {2}','加入我的 CLICQUE 房间“{0}”！{1}在这里玩：{2}'],
+inviteMsg:['Join my CLIQUE room “{0}”! {1}Play here: {2}','Únete a mi sala de CLIQUE “{0}”. {1}Juega aquí: {2}','Rejoins mon salon CLIQUE « {0} » ! {1}Joue ici : {2}','Entre na minha sala de CLIQUE “{0}”! {1}Jogue aqui: {2}','Komm in meinen CLIQUE-Raum „{0}“! {1}Hier spielen: {2}','加入我的 CLIQUE 房间“{0}”！{1}在这里玩：{2}'],
 codePre:['Code: {0}. ','Código: {0}. ','Code : {0}. ','Código: {0}. ','Code: {0}. ','代码：{0}。'],
 soloRoom:['Solo room','Sala individual','Salon solo','Sala solo','Solo-Raum','单人房间'],
-welcome:['Welcome to CLICQUE 👋','Bienvenido a CLICQUE 👋','Bienvenue sur CLICQUE 👋','Bem-vindo ao CLICQUE 👋','Willkommen bei CLICQUE 👋','欢迎来到 CLICQUE 👋'],
+welcome:['Welcome to CLIQUE 👋','Bienvenido a CLIQUE 👋','Bienvenue sur CLIQUE 👋','Bem-vindo ao CLIQUE 👋','Willkommen bei CLIQUE 👋','欢迎来到 CLIQUE 👋'],
 welcome2:['Take a photo or pick an avatar. You can change it later in Settings.','Hazte una foto o elige un avatar. Puedes cambiarlo luego en Ajustes.','Prends une photo ou choisis un avatar. Tu pourras le changer dans les Réglages.','Tire uma foto ou escolha um avatar. Você pode mudar depois nas Configurações.','Mach ein Foto oder wähle einen Avatar. Du kannst es später in den Einstellungen ändern.','拍张照片或选择头像，之后可在设置中更改。'],
 yourAv:['Your avatar','Tu avatar','Ton avatar','Seu avatar','Dein Avatar','你的头像'],
 nick:['Nickname','Apodo','Pseudo','Apelido','Spitzname','昵称'],
@@ -299,7 +299,7 @@ function genNames(n){const used=new Set([CFG.name.toLowerCase()]),out=[];while(o
 
 /* ---------- menus ---------- */
 const langBtn=()=>`<div style="text-align:right"><button class="back" style="padding:0 10px" onclick="langs()">🌐 ${NATIVE[LI()]}</button></div>`;
-function menu(){RUN++;clearT();if(!CFG.setup)return avatar(true);if(new URL(location.href).searchParams.has('room')){joinRoomLink();return}screen(langBtn()+`<div class="logo">CLIC<b>QUE</b></div><p class="tag">${t('tag')}</p><div class="stack"><button class="btn" onclick="solo()">🎮 ${t('single')}</button><button class="btn" onclick="online()">🌐 ${t('online')}</button><button class="btn ghost" onclick="avatar(false,'menu()')">${MYAV()} ${CFG.name} · ${t('avatarBtn')}</button><button class="btn ghost" onclick="settings()">⚙️ ${t('settings')}</button></div>`)}
+function menu(){RUN++;clearT();if(!CFG.setup)return avatar(true);if(new URL(location.href).searchParams.has('room')){joinRoomLink();return}screen(langBtn()+`<div class="logo">CLI<b>QUE</b></div><p class="tag">${t('tag')}</p><div class="stack"><button class="btn" onclick="solo()">🎮 ${t('single')}</button><button class="btn" onclick="online()">🌐 ${t('online')}</button><button class="btn ghost" onclick="avatar(false,'menu()')">${MYAV()} ${CFG.name} · ${t('avatarBtn')}</button><button class="btn ghost" onclick="settings()">⚙️ ${t('settings')}</button></div>`)}
 function langs(){screen(hdr(t('lang'),'menu()')+LANGS.map((l,i)=>`<button class="btn ${CFG.lang==l?'':'ghost'}" onclick="CFG.lang='${l}';ST();document.documentElement.lang='${l}';menu()">${NATIVE[i]}</button>`).join(''))}
 function setName(v){CFG.name=v.replace(/[^\w \-\u00c0-\u00ff]/g,'').trim().slice(0,12)||'Ace';ST()}
 function photo(inp,first,from){const f=inp.files&&inp.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{const im=new Image();im.onload=()=>{try{const c=document.createElement('canvas');c.width=c.height=128;const m=Math.min(im.width,im.height);c.getContext('2d').drawImage(im,(im.width-m)/2,(im.height-m)/2,m,m,0,0,128,128);CFG.photo=c.toDataURL('image/jpeg',.8);ST();avatar(first,from)}catch(e){}};im.src=rd.result};rd.readAsDataURL(f)}
@@ -395,7 +395,7 @@ const CL={st:null,msgs:[],voted:0,round:-1};
 function safeHTML(h){const doc=new DOMParser().parseFromString('<body>'+h+'</body>','text/html'),ok=new Set(['DIV','SPAN','B','EM','H2','H3','P','BR']);
 const walk=n=>{[...n.childNodes].forEach(c=>{if(c.nodeType===1){if(!ok.has(c.tagName)){c.remove();return}[...c.attributes].forEach(a=>{if(a.name!=='class')c.removeAttribute(a.name)});walk(c)}})};walk(doc.body);return doc.body.innerHTML}
 function clientRun(code){RUN++;clearT();mpClean();MP.hb=setInterval(()=>roomCall('heartbeat',code,{name:CFG.name,emo:CFG.avatar,code:MP.r?.code||''}).catch(()=>{}),15000);roomCall('heartbeat',code,{name:CFG.name,emo:CFG.avatar,code:MP.r?.code||''}).catch(()=>{});CL.msgs=[];CL.voted=0;CL.round=-1;CL.st=null;clearInterval(CL.wd);CL.lastSeen=Date.now();CL.wd=setInterval(clWatch,5000);saveRoom(code);
-screen(hdr('CLICQUE','mpLeave()')+'<div id="hoff"></div><div id="ro" class="stage"></div><div id="th"></div><div id="pn" class="card"></div>');const db=NET.db;
+screen(hdr('CLIQUE','mpLeave()')+'<div id="hoff"></div><div id="ro" class="stage"></div><div id="th"></div><div id="pn" class="card"></div>');const db=NET.db;
 MP.unsubs.push(db.doc('rooms/'+code).onSnapshot(s=>{if(!s.exists){clearSaved();mpLeave();return}MP.room=s.data();MP.host=MP.room.host===NET.uid;if(MP.room.status==='lobby'){clearInterval(CL.wd);G=null;mpLobby()}else if(MP.room.status==='closed'){mpLeave()}},e=>setTimeout(()=>{if(MP.code===code)clientRun(code)},2500)));
 MP.unsubs.push(db.doc(`rooms/${code}/live/state`).onSnapshot(s=>{if(s.exists){CL.st=s.data();CL.lastSeen=Date.now();clRender()}},e=>setTimeout(()=>{if(MP.code===code)clientRun(code)},2500)));
 MP.unsubs.push(db.collection(`rooms/${code}/chat`).orderBy('ts').limit(400).onSnapshot(s=>{CL.msgs=s.docs.map(d=>({id:d.id,...d.data()}));clChat()},e=>{}))}
@@ -418,7 +418,7 @@ q('sd').onclick=send;q('ms').onkeydown=e=>{if(e.key==='Enter')send()};
 const tf=()=>{const e=q('tt');if(e&&CL.st)e.textContent=Math.max(0,Math.round((CL.st.chat.deadline-Date.now())/1000))};tf();tick(tf,1000);clChat()}
 function clChat(){const l=q('lg');if(!l||!CL.st||!CL.st.chat)return;l.innerHTML='';CL.msgs.filter(m=>m.g===CL.st.gid&&m.r===CL.st.chat.round&&!BLK.has(m.by)).forEach(m=>{const d=document.createElement('div');d.className='msg';const b=document.createElement('b');b.textContent=String(m.e||'')+' '+String(m.n||'')+' ';d.append(b,document.createTextNode(mod(m.txt||'')));if(m.by!=='host'&&m.by!==NET.uid){const f=document.createElement('span');f.textContent=' ⚑';f.title='Report and block';f.style.cursor='pointer';f.onclick=()=>report(m.by,m.txt);d.append(f)}l.append(d)});l.scrollTop=l.scrollHeight;const lm=CL.msgs.filter(x=>x.g===CL.st.gid&&x.r===CL.st.chat.round).slice(-1)[0];if(lm){const p=(CL.st.ro||[]).find(x=>x.name===lm.n);if(p)spot(p.id)}}
 
-function boot(){RUN++;clearT();screen(`<div class="boot"><div class="blogo">${'CLICQUE'.split('').map((ch,i)=>`<span class="${ch==='Q'?'qq':''}" style="--i:${i}">${ch}</span>`).join('')}</div><p class="btag">${t('tag')}</p><div class="bar"><i></i></div></div>`);
+function boot(){RUN++;clearT();screen(`<div class="boot"><div class="blogo">${'CLIQUE'.split('').map((ch,i)=>`<span class="${ch==='Q'?'qq':''}" style="--i:${i}">${ch}</span>`).join('')}</div><p class="btag">${t('tag')}</p><div class="bar"><i></i></div></div>`);
 setTimeout(()=>{q('app').classList.add('out');setTimeout(()=>{q('app').classList.remove('out');menu();q('app').classList.add('in');setTimeout(()=>q('app').classList.remove('in'),700)},500)},2900)}
 
 /* ---------- game core ---------- */
@@ -465,7 +465,7 @@ n:0,deck:shuffle(ROUNDS),last:'',killcardDone:false,revived:false,lastOut:null,R
 const bots=shuffle(G.P.filter(p=>!isH(p)));
 for(let i=0;i+1<bots.length&&i<6;i+=2){const type=rnd(Object.keys(RELS)),a=bots[i],b=bots[i+1];G.rels.push({a,b,type});a.bio.rel.push(`${b.name} (${RELS[type]})`);b.bio.rel.push(`${a.name} (${RELS[type]})`)}
 castInit();
-screen(hdr('CLICQUE',G.mp?'mpLeave()':'menu()')+'<div id="ro" class="stage"></div><div id="th"></div><div id="pn" class="card"></div><div style="height:104px"></div><div id="dock"><div id="shp"></div><div id="shb"></div></div>');
+screen(hdr('CLIQUE',G.mp?'mpLeave()':'menu()')+'<div id="ro" class="stage"></div><div id="th"></div><div id="pn" class="card"></div><div style="height:104px"></div><div id="dock"><div id="shp"></div><div id="shb"></div></div>');
 if(G.mp)mpHostInit();netInit().then(ok=>{if(ok&&NET.db)NET.db.doc('meta/playbook').get().then(s=>{if(s.exists&&Array.isArray(s.data().tips))PB=s.data().tips.filter(x=>typeof x==='string').slice(0,14)}).catch(()=>{})}).catch(()=>{});
 renderShowBar();castWarm();loop().catch(e=>{if(e!=='x')console.error(e)})}
 function mpHostInit(){const db=NET.db,c=G.mp.code;mpClean();MP.hb=setInterval(()=>roomCall('heartbeat',c,{name:CFG.name,emo:CFG.avatar,code:MP.r?.code||''}).catch(()=>{}),15000);roomCall('heartbeat',c,{name:CFG.name,emo:CFG.avatar,code:MP.r?.code||''}).catch(()=>{});NET.ref=db.doc(`rooms/${c}/live/state`);NET.st={html:'',th:null,ro:[],pk:null,chat:{on:false,round:0,deadline:0},over:false,hb:window.__clicqueShim?1:0};if(window.__clicqueShim)tick(()=>mpPush({}),15000);NET.votes={};
@@ -706,7 +706,7 @@ if(G.endChat)return s;const d=decide(b,al_(b),'out');return s+` PLAN: will vote 
 const pvh=pubVotes().slice(-12).map(h=>`R${h.r}: ${nm(h.v)}->${nm(h.c)}`).join('; ')||'none yet';
 const quiet=al.filter(p=>!(G.rmsgs[p.id]>0)).map(p=>p.name).join(', ')||'nobody',accs=Object.entries(G.acc).filter(e=>e[1]>0&&P(e[0]).alive).map(e=>`${P(e[0]).name}×${e[1]}`).join(', ')||'none';
 const hist=G.log.slice(-20).map(l=>`${l.n}: ${l.t}`).join('\n')||'(chat just started)',mem=memSummary();
-return `You write the group chat of CLICQUE, a social-elimination party game, speaking as the AI characters below. Write the next 4 chat messages in ${lang}.
+return `You write the group chat of CLIQUE, a social-elimination party game, speaking as the AI characters below. Write the next 4 chat messages in ${lang}.
 ${G.endChat?`THE GAME JUST ENDED. Winner: ${P(G.endChat.w).name}. Everyone, eliminated players included, now chats for 44 seconds: congratulations, sour grapes, last jabs, reconciliations, and confessions of real votes taken only from PRIVATE KNOWLEDGE. `:''}Round ${G.n}. Alive: ${al.map(p=>p.name+(isH(p)?' (human)':'')).join(', ')}. Eliminated: ${D().map(p=>p.name).join(', ')||'nobody yet'}. ${G.lastOut?'Just eliminated: '+G.lastOut.name+'.':''} ${G.late?'The chat is almost over, so people should start saying who they will vote for.':''}
 CHARACTERS:
 ${sheet}
