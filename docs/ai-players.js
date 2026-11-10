@@ -1,4 +1,4 @@
-/* CLICQUE: autonomous AI contestants (readable copy). Already built into clicque.html and www/index.html. */
+/* CLIQUE: autonomous AI contestants (readable copy). Already built into clicque.html and www/index.html. */
 
 /* ===== cast.js ===== */
 /* ---------- autonomous cast: profiles, relationships, memory, alliances, rumours, feed, private messages ---------- */

@@ -1,6 +1,6 @@
 {
-  "name": "CLICQUE: Social Elimination",
-  "short_name": "CLICQUE",
+  "name": "CLIQUE: Social Elimination",
+  "short_name": "CLIQUE",
   "description": "A quick social deduction game for friends, with lively AI players when your group is small.",
   "start_url": "./index.html",
   "scope": "./",

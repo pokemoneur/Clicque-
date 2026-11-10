@@ -1,4 +1,4 @@
-# CLICQUE: real app project
+# CLIQUE: real app project
 
 Everything here is ready to run, but **I could not build or test the native apps or the live server from my side**
 (no network, no Xcode/Android tooling). What *was* tested: the game logic (400 simulated games in 6 languages, no rule errors)

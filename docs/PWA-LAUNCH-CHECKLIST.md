@@ -1,10 +1,10 @@
-# Clicque PWA launch checklist
+# Clique PWA launch checklist
 
 Status reviewed against the repository on 9 November 2026. “In repository” means the project contains the relevant scaffold or code; it does not mean it has been verified on a live phone or account.
 
 ## What is already in the repository
 
-- [x] Product identity draft aligned: CLICQUE: Social Elimination, short listing copy, promise, and solo-first release scope.
+- [x] Product identity draft aligned: CLIQUE: Social Elimination, short listing copy, promise, and solo-first release scope.
 - [x] Supplied glossy Q icon installed as the 1024px master and PWA launcher icon set.
 - [x] Replaced placeholder Capacitor app ID with `com.clicque.game`; replace with an owned-domain ID if desired before creating native projects.
 - [ ] Choose a support email and a domain you control before store submission.
@@ -16,7 +16,7 @@ Status reviewed against the repository on 9 November 2026. “In repository” m
 - [x] Added a clearer, staged round reveal, a short pause before elimination names appear, and concise round-specific dialogue guidance.
 - [x] Fixed missing Killcard title/description translations and prevented the forced Killcard from returning later in the same game.
 - [x] Added a single-player Ready button for eliminated spectators and gated developer controls behind the existing server passcode.
-- [x] Corrected the animated intro and online room headings to spell CLICQUE consistently.
+- [x] Corrected the animated intro and online room headings to spell CLIQUE consistently.
 - [x] Added online Ready controls for every real participant, including eliminated spectators; AI seats follow once every real player is ready.
 - [ ] Live PWA installation and update behavior verified on current iOS Safari and Android Chrome devices.
 - [ ] Online multiplayer verified against the currently deployed Supabase project.

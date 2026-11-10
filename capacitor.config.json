@@ -1,6 +1,6 @@
 {
   "appId": "com.clicque.game",
-  "appName": "CLICQUE",
+  "appName": "CLIQUE",
   "webDir": "www",
   "bundledWebRuntime": false,
   "ios": { "contentInset": "always" },

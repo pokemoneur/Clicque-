@@ -1,6 +1,6 @@
 # Store listing drafts (edit freely)
 
-**Name:** CLICQUE: Social Elimination
+**Name:** CLIQUE: Social Elimination
 **Subtitle (iOS, 30 chars):** Chat. Vote. Survive.
 **Short description (Google, 80 chars):** Chat, bluff and vote in a quick party game with lively AI players.
 
@@ -10,7 +10,7 @@
 **First release focus:** Solo-first, with private friend rooms as the next step; no public matchmaking in the first release.
 
 ## Full description
-Who do you trust? In CLICQUE, 5 to 10 players chat, accuse, defend and vote one another out, round after round, until only two remain. Then the eliminated players decide who wins.
+Who do you trust? In CLIQUE, 5 to 10 players chat, accuse, defend and vote one another out, round after round, until only two remain. Then the eliminated players decide who wins.
 
 - Every round is different: secret votes, public votes, a save chain, nominations, ghost votes, mixed juries, even a spinning wheel.
 - Played out? A bonus round can bring someone back from the dead.
